@@ -22,9 +22,21 @@ dc = {
 }
 k,v = random.choice(list(dc.items()))
 print(v)
-a = input()
-for i in range(1,34):
-    if v == k:
+i = 0
+while 5 > i:
+      a = input()
+    #   print(k)
+    #   print(v)
+      if v == k:
         print("correct")
-    else:
+        pass
+      else:
         print("incorrect")
+        print("答えは " + (k) + "でした。")
+      k,v = random.choice(list(dc.items()))
+    #   print(k)
+      print("continuation? yes/no")
+      if a == "no":
+         print("see you next game!")
+         break
+      i += 1
