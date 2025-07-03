@@ -1,6 +1,6 @@
 import random
 
-r = random.randint(1,100)
+r = random.randint(1, 100)
 # print(r)
 p = "failure,onemore!"
 print("1~100の中から正解を当てろ")
@@ -26,12 +26,12 @@ if w == r:
 else:
     print("continuation? yes?/no?")
     w = input()
-    if w =="yes":
+    if w == "yes":
         print("1~100の中から正解を当てろ")
     if r < 50:
-       print("50未満だ")
+        print("50未満だ")
     else:
-       print("50以上だ")
+        print("50以上だ")
 for i in range(5):
     w = int(input())
     print(f"君の答えは{w}だ")
