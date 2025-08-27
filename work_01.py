@@ -11,7 +11,7 @@ while True:
     c = 0
     for i in range(5):
         c = c + 1
-        input_line = int(input("1から100の数字を入力してください: "))
+        input_line = int(input("1から100の数字を入力してくれ: "))
         if input_line == a:
             print("正解")
             result = True
@@ -30,9 +30,9 @@ while True:
                     print("もっと小さい数字ですが、かなり近いです")
 
     if result:
-        print(f"ゲームに勝ちました！ あなたは{c}回目で正解しました。")
+        print(f"勝ったぞ！ 君は{c}回目で正解したぞ。")
     else:
-        print(f"ゲームに負けました。正解は{a}でした。")
+        print(f"負けちゃったな。正解は{a}だったみたいだぞ。")
 
     ans = input("もう一度やる？(yes/no): ")
     if ans != "yes":
