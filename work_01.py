@@ -11,20 +11,20 @@ while True:
     c = 0
     for i in range(5):
         c = c + 1
-        input_line = int(input("1から100の数字を入力してくれ: "))
-        if input_line == a:
+        i = int(input("1から100の数字を入力してくれ: "))
+        if i == a:
             print("正解")
             result = True
             break
         else:
             print("不正解")
-            if input_line < a:
-                if a - input_line > 10:
+            if i < a:
+                if a - i > 10:
                     print("10以上大きい")
                 else:
                     print("もっと大きい数字ですが、かなり近いです")
             else:
-                if input_line - a > 10:
+                if i - a > 10:
                     print("10以上小さいです")
                 else:
                     print("もっと小さい数字ですが、かなり近いです")
