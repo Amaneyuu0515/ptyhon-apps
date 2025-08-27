@@ -5,7 +5,7 @@ while True:
     # ランダムな数字を生成
 
     a = random.randint(1, 100)  # 1から100のランダムな整数を生成
-    print(a)
+    # print(a)
 
     result = False  # ゲームの結果を格納する変数
     c = 0
