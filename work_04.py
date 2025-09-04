@@ -1,64 +1,85 @@
-# - 名産品を表示し、それがどの都道府県のものかを当てるクイズを作成
-# - 辞書(dict)に名産品の名前とその都道府県名のデータを作成
-#     - ネットで検索してデータを作る
-# - 最初にゲームのルールについて説明を表示する
-# - 辞書からランダムで１問を選び、 ◯◯ はどこの都道府県の名産品でしょうと表示し、入力を待つ
-# - 入力されたら正解、不正解を出力
+import time
 import random
+import mysql.connector
+from datetime import datetime
 
-print("ボカロ曲の作者を当てろ")
-dc = {
-    "DECO*27": "モニタリング",
-    "40mP": "からくりピエロ",
-    "じん": "カゲロウデイズ",
-    "ハチ": "砂の惑星",
-    "ryo": "メルト",
-    "ピノキオピー": "神っぽいな",
-    "cosMo@暴走P": "初音ミクの消失",
-    "kemu": "六兆年と一夜物語",
-    "黒うさ": "千本桜",
-    "wowaka": "アンノウン・マザーグース",
-    "Neru": "ロストワンの号哭",
-    "れるりり": "神のまにまに",
-    "OSTER project": "ニジイロストーリーズ",
-    "Giga": "劣等上等",
-    "オワタP": "パラジクロロベンゼン",
-    "mothy": "悪ノ娘",
-    "Last Note.": "セツナトリップ",
-    "みきとP": "少女レイ",
-    "バルーン": "シャルル",
-    "ぬゆり": "フラジール",
-    "日向電工": "ブリキノダンス",
-    "まふまふ": "携帯恋話",
-    "ナユタン星人": "エイリアンエイリアン",
-    "八王子P": "気まぐれメルシィ",
-    "すりぃ": "エゴロック",
-    "syudou": "ビターチョコデコレーション",
-    "電ポルP ": "独りんぼエンヴィー",
-    "Eve": "ナンセンス文学",
-    "柊マグネタイト": "マーシャル・マキシマイザー",
-    "Kanaria": "KING",
-    "マイキP": "サイバーパンクデッドボーイ",
-    "なきそ": "化けの花",
-    "いよわ": "熱異常",
-}
-k, v = random.choice(list(dc.items()))
-print(v)
-i = 0
-while 5 > i:
-    a = input()
-    #   print(k)
-    #   print(v)
-    if v == k:
-        print("correct")
-        pass
-    else:
-        print("incorrect")
-        print("答えは " + (k) + "でした。")
-    k, v = random.choice(list(dc.items()))
-    #   print(k)
-    print("continuation? yes/no")
-    if a == "no":
-        print("see you next game!")
-        break
-    i += 1
+# ランダムな待ち時間
+b = random.randint(3, 5)
+time.sleep(b)
+
+# 合図が出た時刻
+s = time.time()
+print("刹那の見切り!! 合図が出たらenterを押せ!")
+print("!!!!!")
+
+# プレイヤーの入力を待つ
+input("▶︎ 押せ！")
+
+# 押した時刻
+e = time.time()
+
+# 結果表示
+print(f"開始時:{s}秒")
+print(f"終了:{e}秒")
+
+k = e - s
+print(f"かかった時間 {k:.4f} 秒")
+
+if k < 0.01:
+    print("歪")
+print("押された")
+
+# プレイヤー名入力
+name = input("名前を入力してください: ")
+
+# DBに接続
+conn = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password="amaneyuu0515",
+    database="work04",
+    autocommit=True,   # ← 追加
+    connection_timeout=60
+)
+cursor = conn.cursor()
+
+# データを挿入
+sql = "INSERT INTO record (name, record_time, started_at) VALUES (%s, %s, %s)"
+values = (name, datetime.fromtimestamp(e), datetime.fromtimestamp(s))
+cursor.execute(sql, values)
+print(cursor.rowcount, "件追加されました")
+
+cursor.close()
+conn.close()   # ← いったん閉じる
+
+# ===== ランキング表示 =====
+conn = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password="amaneyuu0515",
+    database="work04",
+    autocommit=True,
+    connection_timeout=60
+)
+cursor = conn.cursor()
+
+print("\n=== ランキング (TOP10) ===")
+sql = """
+SELECT
+    name,
+    record_time,
+    started_at,
+    TIMESTAMPDIFF(MICROSECOND, started_at, record_time) / 1000000.0 AS
+    reaction_time
+FROM record
+ORDER BY reaction_time ASC
+LIMIT 10
+"""
+cursor.execute(sql)
+
+for i, row in enumerate(cursor.fetchall(), start=1):
+    name, record_time, started_at, reaction_time = row
+    print(f"{i}位: {name} さん - 反応時間 {reaction_time:.4f} 秒")
+
+cursor.close()
+conn.close()
