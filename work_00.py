@@ -28,12 +28,9 @@ class ChatGame:
         for widget in self.button_frame.winfo_children():
             widget.destroy()
 
-    def add_next_button(self, func=None):
+    def add_next_button(self):
         self.clear_buttons()
-        btn = tk.Button(
-            self.button_frame, text="▶︎次へ", command=lambda:
-            self.next_line(func)
-        )
+        btn = tk.Button(self.button_frame, text="▶︎次へ", command=self.next_line)
         btn.pack()
 
     def add_choice_buttons(self, options, func_list):
@@ -47,11 +44,7 @@ class ChatGame:
             btn.pack(side="left", padx=5)
 
     # ===== script_queueを処理 =====
-    def next_line(self, after_func=None):
-        if after_func:
-            after_func()
-            return
-
+    def next_line(self):
         if not self.script_queue:
             self.add_text("=== END ===")
             self.clear_buttons()
@@ -62,8 +55,9 @@ class ChatGame:
         if isinstance(line, str):
             self.add_text(line)
             self.add_next_button()
+        elif callable(line):  # 関数なら実行
+            line()
         elif isinstance(line, list) and len(line) == 2:
-            # [選択肢リスト, 対応関数リスト]
             options, funcs = line
             self.add_choice_buttons(options, funcs)
         else:
@@ -76,7 +70,7 @@ class ChatGame:
         else:
             print("選択肢のインデックスが範囲外です:", idx)
 
-    # ===== ゲーム章（オリジナルセリフ） =====
+    # ===== ゲーム章 =====
     def main(self):
         self.script_queue = [
             "👤 とある王国、あなたはその王国の一般人だった。",
@@ -93,8 +87,9 @@ class ChatGame:
             "👤 王様「素晴らしい…その勇気、しかと見届けた。」",
             "👤 王様「では、まずは北の森へ向かうがよい。」",
             "👤 王様から剣と盾を受け取り、あなたは旅立つことになった。",
+            self.chapter2,
         ]
-        self.add_next_button(self.chapter2)
+        self.next_line()
 
     def main_choice_no(self):
         self.script_queue = [
@@ -102,8 +97,9 @@ class ChatGame:
             "👤 王様「……そうか。勇なき者に未来はない。」",
             "👤 王様「ここで終わりだ。衛兵よ、此奴を捕らえよ！」",
             "👤 あなたは王へ反逆したとされ処刑されてしまった。",
+            self.bad_ending,
         ]
-        self.add_next_button(self.bad_ending)
+        self.next_line()
 
     # ===== 章2 =====
     def chapter2(self):
@@ -130,8 +126,9 @@ class ChatGame:
             "👤 リリアンヌ「わかった、私についてきて。」",
             "👤 あなたは少女と共に森へ踏み出した。",
             "👤 深い霧の中、魔物の気配が近づいてくる――。",
+            self.chapter3_with_girl,
         ]
-        self.add_next_button(self.chapter3_with_girl)
+        self.next_line()
 
     def chapter2_ignore(self):
         self.script_queue = [
@@ -141,10 +138,11 @@ class ChatGame:
             "👤 足元に気を取られていると、突然背後から何かが襲いかかってきた――！",
             "👤 あなた「！！」",
             "👤 魔物『ガアアア……！』",
+            self.bad_ending,
         ]
-        self.add_next_button(self.bad_ending)
+        self.next_line()
 
-    # ===== 章3以降（リリアンヌと魔王） =====
+    # ===== 章3 =====
     def chapter3_with_girl(self):
         self.script_queue = [
             "👤 あなたとリリアンヌは森の奥へと進んでいった。",
@@ -159,16 +157,19 @@ class ChatGame:
             "👤 あなた「、、、戦いたくないし、逃げよう」",
             "👤 あなたとリリアンヌは魔物を避けて森を進んでいく。",
             "👤 あなたたちは無事に森を抜けることができた。",
+            self.chapter4,
         ]
-        self.add_next_button(self.chapter4)
+        self.next_line()
 
     def chapter3_attack(self):
         self.script_queue = [
             "👤 あなた「、、、自分でやるから、下がってて。」",
             "👤 少女は魔法でなんとか魔物を退けたが、あなたの受けた傷は致命傷となってしまった。",
+            self.bad_ending,
         ]
-        self.add_next_button(self.bad_ending)
+        self.next_line()
 
+    # ===== 章4 =====
     def chapter4(self):
         self.script_queue = [
             "👤 あなたとリリアンヌは森を抜け、広い平原に出た。",
@@ -181,17 +182,20 @@ class ChatGame:
             "👤 あなたはリリアンヌの提案を受け入れ、少し休むことにした。",
             "👤 あなたはリリアンヌと共に草むらで休息を取った。",
             "👤 準備ができたら、魔王の城へ向かうことにした。",
+            self.chapter5,
         ]
-        self.add_next_button(self.chapter5)
+        self.next_line()
 
     def chapter4_go(self):
         self.script_queue = [
             "👤 あなたはすぐに進むことを決意した。",
             "👤 疲れが溜まっていた所に魔物が現れた。",
             "👤 あなたは疲れ切っていて、まともに戦うことができなかった。",
+            self.bad_ending,
         ]
-        self.add_next_button(self.bad_ending)
+        self.next_line()
 
+    # ===== 章5 =====
     def chapter5(self):
         self.script_queue = [
             "👤 あなたとリリアンヌは苦難の末魔王の城へと向かった。",
@@ -205,15 +209,17 @@ class ChatGame:
             "👤 ついに、魔王が姿を現した。",
             "👤 魔王「人間ども、よくも、、」",
             "👤 あなた「魔王、、やるしかないのか、、」",
+            self.normal_ending,
         ]
-        self.add_next_button(self.normal_ending)
+        self.next_line()
 
     def chapter5_talk(self):
         self.script_queue = [
             "👤 あなた「、、、やっぱり、戦うの好きじゃないや、俺、、」",
             "👤 魔王「、、、そうか、ならば、我と共にくるが良い、」",
+            self.good_ending,
         ]
-        self.add_next_button(self.good_ending)
+        self.next_line()
 
     # ===== エンディング =====
     def good_ending(self):
@@ -221,14 +227,14 @@ class ChatGame:
             "🌟【エンディング：理想のセカイ】",
             "👤 あなたとリリアンヌは魔王と共に新しい世界を築く。",
         ]
-        self.add_next_button()
+        self.next_line()
 
     def normal_ending(self):
         self.script_queue = [
             "🌙【エンディング：平和な日常...?】",
             "👤 王様「よくぞ魔王を倒してくれた！お主はこの世界の英雄じゃ！」",
         ]
-        self.add_next_button()
+        self.next_line()
 
     def bad_ending(self):
         self.script_queue = [
@@ -236,7 +242,7 @@ class ChatGame:
             "👤 魔王「人間どもを皆殺しにしろ！我らの国を守るために！」",
             "👤 勇者を失った世界は魔物に全てを滅ぼされた。",
         ]
-        self.add_next_button()
+        self.next_line()
 
 
 if __name__ == "__main__":
